@@ -53,7 +53,7 @@ __global__ void shmem_reduce_kernel(float * d_out, const float * d_in)
     }
 }
 
-void reduce(float * d_out, float * d_intermediate, float * d_in, 
+void reduce(float * d_out, float * d_intermediate, float * d_in,
             int size, bool usesSharedMemory)
 {
     // assumes that size is not greater than maxThreadsPerBlock^2
@@ -101,9 +101,9 @@ int main(int argc, char **argv)
     if (cudaGetDeviceProperties(&devProps, dev) == 0)
     {
         printf("Using device %d:\n", dev);
-        printf("%s; global mem: %dB; compute v%d.%d; clock: %d kHz\n",
-               devProps.name, (int)devProps.totalGlobalMem, 
-               (int)devProps.major, (int)devProps.minor, 
+        printf("%s; global mem: %ldB; compute v%d.%d; clock: %d kHz\n",
+               devProps.name, (long)devProps.totalGlobalMem,
+               (int)devProps.major, (int)devProps.minor,
                (int)devProps.clockRate);
     }
 
@@ -128,13 +128,13 @@ int main(int argc, char **argv)
     cudaMalloc((void **) &d_out, sizeof(float));
 
     // transfer the input array to the GPU
-    cudaMemcpy(d_in, h_in, ARRAY_BYTES, cudaMemcpyHostToDevice); 
+    cudaMemcpy(d_in, h_in, ARRAY_BYTES, cudaMemcpyHostToDevice);
 
     int whichKernel = 0;
     if (argc == 2) {
         whichKernel = atoi(argv[1]);
     }
-        
+
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
     }
     cudaEventSynchronize(stop);
     float elapsedTime;
-    cudaEventElapsedTime(&elapsedTime, start, stop);    
+    cudaEventElapsedTime(&elapsedTime, start, stop);
     elapsedTime /= 100.0f;      // 100 trials
 
     // copy back the sum from GPU
@@ -177,6 +177,6 @@ int main(int argc, char **argv)
     cudaFree(d_in);
     cudaFree(d_intermediate);
     cudaFree(d_out);
-        
+
     return 0;
 }
